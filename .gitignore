@@ -1,0 +1,14 @@
+# logs produced at runtime
+*.log
+zedmd.log
+watch.log
+
+# never commit artwork (licensing) or ROMs
+*.gif
+*.png
+*.zip
+*.chd
+
+# OS cruft
+.DS_Store
+Thumbs.db
