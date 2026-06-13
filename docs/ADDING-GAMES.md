@@ -28,8 +28,15 @@ score from steady timers) sweep a RAM window and rank candidates. Env: `ZLO`, `Z
 ```bash
 ZLO=0xff0000 ZHI=0xffd000 ZSTRIDE=2 ... -autoboot_script tools/scan2.lua
 ```
-For **skill games where the autopilot can't score** (e.g. Donkey Kong), use `tools/watch.lua` instead:
-a HUMAN plays while it logs bursty-increasing candidates to `watch.log` every ~16 s.
+For **skill games where the autopilot can't score** (e.g. Donkey Kong), a HUMAN has to play.
+Two options:
+- `tools/watch.lua` — logs bursty-increasing candidates to `watch.log` every ~16 s while you play.
+- `tools/dkdump.lua` + `tools/dkbrute.py` (the decisive method) — `dkdump.lua` dumps the full
+  work-RAM every few seconds to `dkdump.log`; you play to a **known final score**; then
+  `dkbrute.py` brute-forces every address/width/byte-order/decode/multiplier and reports which one
+  produces a clean monotonic climb to your score. This is how `dkong` (`0x60b2`, 3-byte BCD) was
+  found after the documented DOFLinx address looked wrong under the wrong decode. Edit the score
+  target and RAM window at the top of each script.
 
 ## 4. Decode method
 Most arcade scores are **packed BCD** (two decimal digits per byte). Some (e.g. Galaga) store

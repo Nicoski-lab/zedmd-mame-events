@@ -7,6 +7,8 @@ local DRY=(os.getenv("ZEDMD_DRYRUN")=="1")
 
 -- tiers: {minDelta,maxDelta,gif} in DECODED points (BCD). delay = ms between animations.
 local GAMES = {
+  dkong = { addr=0x60b2, bytes=3, mult=1, delay=1000, tiers={
+    {100,200,"generic_100.gif"}, {300,300,"dkong_explosion.gif"}, {600,5000,"dkong_bonus.gif"} }},
   galaga = { addr=0x83f8, bytes=8, mult=1, digits=true, delay=5000, tiers={
     {50,160,"galaga_shipinflight-exploding.gif"}, {400,400,"galaga_bossinflight-exploding.gif"},
     {800,800,"galaga_bossinflight-exploding.gif"}, {1600,1600,"galaga_bossinflight-exploding.gif"},
