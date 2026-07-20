@@ -7,6 +7,14 @@ local DRY=(os.getenv("ZEDMD_DRYRUN")=="1")
 
 -- tiers: {minDelta,maxDelta,gif} in DECODED points (BCD). delay = ms between animations.
 local GAMES = {
+  mspacman = { addr=0x4e80, bytes=4, mult=1, rev=true, delay=3000, tiers={
+    {50,60,"pacman_powerpellet.gif"}, {100,100,"pacman_cherry.gif"},
+    {200,210,"pacman_ghost200.gif"}, {300,300,"pacman_strawberry.gif"},
+    {400,410,"pacman_ghost400.gif"}, {500,500,"pacman_orange.gif"},
+    {700,700,"mspacman_pretzel.gif"}, {800,810,"pacman_ghost800.gif"},
+    {1000,1000,"pacman_apple.gif"}, {1600,1610,"pacman_ghost1600.gif"},
+    {2000,2000,"mspacman_pear.gif"}, {5000,5000,"mspacman_bannana.gif"},
+    {10000,10000,"mspacman_bannana.gif"} }},
   dkong = { addr=0x60b2, bytes=3, mult=1, delay=1000, tiers={
     {100,200,"generic_100.gif"}, {300,300,"dkong_explosion.gif"}, {600,5000,"dkong_bonus.gif"} }},
   galaga = { addr=0x83f8, bytes=8, mult=1, digits=true, delay=5000, tiers={
@@ -39,6 +47,14 @@ local function readscore()
     for i=cfg.bytes-1,0,-1 do
       local b=sp:read_u8(cfg.addr+i)
       v = v*10 + ((b<=9) and b or 0)
+    end
+    return v*cfg.mult
+  end
+  if cfg.rev then  -- packed BCD, little-endian (least-significant pair at lowest addr)
+    local v=0
+    for i=cfg.bytes-1,0,-1 do
+      local b=sp:read_u8(cfg.addr+i)
+      v = v*100 + math.floor(b/16)*10 + (b%16)
     end
     return v*cfg.mult
   end
