@@ -54,6 +54,7 @@ plays a big one — the same mapping philosophy as the DOFLinx `.MAME` community
 | ROM | Game | Art used |
 |-----|------|----------|
 | `mspacman`| Ms. Pac-Man     | **13 tiers** — per-ghost (200/400/800/1600) + every fruit |
+| `digdug`  | Dig Dug         | dedicated Pooka / Fygar kill animations |
 | `galaga`  | Galaga          | dedicated galaga ship/boss/challenge animations |
 | `dkong`   | Donkey Kong     | dedicated dkong explosion/bonus animations |
 | `agallet` | Air Gallet      | generic explosions, sized by kill |

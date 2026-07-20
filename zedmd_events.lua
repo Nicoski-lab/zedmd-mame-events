@@ -7,6 +7,8 @@ local DRY=(os.getenv("ZEDMD_DRYRUN")=="1")
 
 -- tiers: {minDelta,maxDelta,gif} in DECODED points (BCD). delay = ms between animations.
 local GAMES = {
+  digdug = { addr=0x8414, bytes=3, mult=1, rev=true, delay=3000, tiers={
+    {200,500,"digdug_pooka.gif"}, {501,1000,"digdug_fygar.gif"} }},
   mspacman = { addr=0x4e80, bytes=4, mult=1, rev=true, delay=3000, tiers={
     {50,60,"pacman_powerpellet.gif"}, {100,100,"pacman_cherry.gif"},
     {200,210,"pacman_ghost200.gif"}, {300,300,"pacman_strawberry.gif"},
