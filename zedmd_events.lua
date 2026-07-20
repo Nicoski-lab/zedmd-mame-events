@@ -5,8 +5,13 @@ local GIFDIR="/userdata/system/pixelcade-master/mameoutput/"
 local LOGFILE="/userdata/system/zedmd-mame/zedmd.log"
 local DRY=(os.getenv("ZEDMD_DRYRUN")=="1")
 
--- tiers: {minDelta,maxDelta,gif} in DECODED points (BCD). delay = ms between animations.
+-- Two trigger styles:
+--   score-delta : addr/bytes/mult (+rev|digits) and tiers={minDelta,maxDelta,gif} in DECODED points
+--   output      : outputs={{"<mame_output_name>","gif"},...} fires on the output's rising edge
+-- delay = ms between animations (cooldown).
 local GAMES = {
+  -- output-triggered: Q*bert's cabinet "knocker" thumps when he falls off the pyramid
+  qbert = { outputs={ {"knocker0","qbert_fall.gif"} }, delay=5000 },
   digdug = { addr=0x8414, bytes=3, mult=1, rev=true, delay=3000, tiers={
     {200,500,"digdug_pooka.gif"}, {501,1000,"digdug_fygar.gif"} }},
   mspacman = { addr=0x4e80, bytes=4, mult=1, rev=true, delay=3000, tiers={
@@ -40,6 +45,26 @@ local rom=emu.romname()
 local cfg=GAMES[rom]
 if not cfg then return end
 local delayframes = math.floor(cfg.delay*60/1000 + 0.5)
+local function fire(gif,d) log("FIRE "..gif.." ("..tostring(d)..")")
+  if not DRY then os.execute("dmd-play -f \""..GIFDIR..gif.."\" --once --overlay >/dev/null 2>&1 &") end end
+
+-- OUTPUT-TRIGGERED games (no score watching): fire on a named MAME output's rising edge
+if cfg.outputs then
+  log("ACTIVE rom="..rom.." output-mode delay="..delayframes.."f"..(DRY and " DRYRUN" or ""))
+  local om = manager.machine.output
+  local last, cool = {}, 0
+  _G.zedmd_out_sub = emu.add_machine_frame_notifier(function()
+    if cool > 0 then cool = cool - 1 end
+    for _,o in ipairs(cfg.outputs) do
+      local name, gif = o[1], o[2]
+      local v = om:get_value(name)
+      if v ~= 0 and (last[name] or 0) == 0 and cool == 0 then fire(gif, name); cool = delayframes end
+      last[name] = v
+    end
+  end)
+  return
+end
+
 log("ACTIVE rom="..rom.." addr=0x"..string.format("%x",cfg.addr).." bcd delay="..delayframes.."f"..(DRY and " DRYRUN" or ""))
 
 local sp=manager.machine.devices[":maincpu"].spaces["program"]
@@ -68,9 +93,6 @@ local function readscore()
   end
   return v*cfg.mult
 end
-local function fire(gif,d) log("FIRE "..gif.." delta="..d)
-  if not DRY then os.execute("dmd-play -f \""..GIFDIR..gif.."\" --once --overlay >/dev/null 2>&1 &") end end
-
 local last,cooldown=nil,0
 _G.zedmd_ev_sub=emu.add_machine_frame_notifier(function()
   if cooldown>0 then cooldown=cooldown-1 end

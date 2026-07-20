@@ -22,9 +22,14 @@ standalone MAME (running the game)
 The `--once --overlay` flags make `dmd-play` play the GIF once, then **restore the previous
 marquee** automatically — so the animation is a brief overlay on top of your normal marquee art.
 
-Score deltas are decoded to real points (packed-BCD or one-digit-per-byte, depending on the game)
-and matched against per-game tier tables, so a small kill plays a small explosion and a boss kill
-plays a big one — the same mapping philosophy as the DOFLinx `.MAME` community files.
+Score deltas are decoded to real points (packed-BCD forward or little-endian, or one-digit-per-byte,
+depending on the game) and matched against per-game tier tables, so a small kill plays a small
+explosion and a boss kill plays a big one — the same mapping philosophy as the DOFLinx `.MAME`
+community files.
+
+Some games aren't score-driven at all. **Q\*bert** triggers on a **MAME output** (`knocker0` — the
+cabinet solenoid that thumps when Q\*bert falls off the pyramid), so the plugin also supports
+output-triggered events via `outputs={{"knocker0","qbert_fall.gif"}}`, firing on the rising edge.
 
 ## Requirements
 
@@ -55,6 +60,7 @@ plays a big one — the same mapping philosophy as the DOFLinx `.MAME` community
 |-----|------|----------|
 | `mspacman`| Ms. Pac-Man     | **13 tiers** — per-ghost (200/400/800/1600) + every fruit |
 | `digdug`  | Dig Dug         | dedicated Pooka / Fygar kill animations |
+| `qbert`   | Q\*bert         | **output-triggered** — the cabinet knocker (Q\*bert falls) |
 | `galaga`  | Galaga          | dedicated galaga ship/boss/challenge animations |
 | `dkong`   | Donkey Kong     | dedicated dkong explosion/bonus animations |
 | `agallet` | Air Gallet      | generic explosions, sized by kill |
